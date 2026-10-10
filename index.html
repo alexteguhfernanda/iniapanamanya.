@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SponsorBot - Demo Interaktif</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=DM+Sans:wght@400;500;700&display=swap">
+<style>
+:root{--bg:#F4F1EA;--card:#fff;--ink:#0F1B2D;--mut:#4A586C;--line:#D8D3C6;--acc:#FFB547;--teal:#2EC4B6;--coral:#FF7A66;--dark:#0F1B2D;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B1423;--card:#16263D;--ink:#F4F1EA;--mut:#A9B5C7;--line:#2A3A52;--dark:#060D18}}
+:root[data-theme="dark"]{--bg:#0B1423;--card:#16263D;--ink:#F4F1EA;--mut:#A9B5C7;--line:#2A3A52;--dark:#060D18}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'DM Sans',system-ui,sans-serif;line-height:1.5}
+.w{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+h1{font-family:'Space Grotesk',system-ui,sans-serif;font-size:34px;margin:0}
+h2{font-family:'Space Grotesk',system-ui,sans-serif;font-size:22px;margin:0 0 4px}
+.sub{color:var(--mut);margin:4px 0 16px}
+.note{font-size:13px;background:var(--card);border:1px dashed var(--line);border-radius:10px;padding:8px 12px;color:var(--mut);margin-bottom:16px}
+.tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:16px}
+.tab{flex:1;min-width:110px;min-height:44px;border:1px solid var(--line);background:var(--card);color:var(--mut);border-radius:12px;font:700 13px 'DM Sans',sans-serif;cursor:pointer}
+.tab.on{background:var(--dark);color:var(--acc);border-color:var(--dark)}
+.tab:disabled{opacity:.45;cursor:default}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+label{display:block;font-size:13px;font-weight:700;margin:10px 0 4px}
+input,select,textarea{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--bg);color:var(--ink);font:15px 'DM Sans',sans-serif}
+textarea{min-height:90px}
+.btn{min-height:44px;border:0;border-radius:12px;padding:0 18px;background:var(--dark);color:var(--acc);font:700 15px 'DM Sans',sans-serif;cursor:pointer}
+.btn.alt{background:transparent;color:var(--ink);border:1px solid var(--ink)}
+.btn.sm{min-height:38px;font-size:13px;padding:0 12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.log{font:13px ui-monospace,monospace;background:var(--dark);color:#CFF1EC;border-radius:12px;padding:12px;min-height:60px}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin:6px 0}
+.bar i{display:block;height:100%;background:var(--acc)}
+.sc{font:700 20px 'Space Grotesk',sans-serif}
+.tag{display:inline-block;font-size:12px;font-weight:700;border-radius:99px;padding:2px 10px;background:var(--acc);color:#0F1B2D}
+.tag.t{background:var(--teal)}.tag.c{background:var(--coral)}.tag.g{background:var(--line);color:var(--ink)}
+pre{white-space:pre-wrap;font:14px 'DM Sans',sans-serif;margin:8px 0;background:var(--bg);border-radius:10px;padding:10px;border:1px solid var(--line)}
+.hide{display:none}
+</style>
+</head>
+<body>
+<div class="w">
+<h1>SponsorBot</h1>
+<p class="sub">Demo interaktif: RPA mengerjakan yang berulang, Agentic AI memutuskan, panitia menyetujui.</p>
+<div class="note">Ini prototipe simulasi untuk demo. Nama perusahaan dan skor adalah data ilustrasi, bukan perusahaan nyata, dan email tidak benar-benar terkirim.</div>
+<div class="tabs" id="tabs"></div>
+
+<section id="s0">
+<h2>1. Input acara</h2>
+<div class="card">
+<label>Nama acara</label><input id="nama" value="Eco Fest 2026">
+<label>Nama organisasi</label><input id="org" value="BEM Fakultas Teknik">
+<label>Tema acara</label>
+<select id="tema"><option value="lingkungan">Lingkungan</option><option value="teknologi">Teknologi</option><option value="pendidikan">Pendidikan</option><option value="olahraga">Olahraga</option><option value="musik">Musik dan seni</option></select>
+<label>Target dana (Rp)</label><input id="dana" value="15.000.000">
+<label>Benefit sponsor</label><textarea id="benefit">logo di poster dan media sosial, booth di area acara, dan sesi presentasi singkat</textarea>
+<div class="row" style="margin-top:14px"><button class="btn" id="go">Analisis dengan SponsorBot</button></div>
+</div>
+</section>
+
+<section id="s1" class="hide">
+<h2>2. RPA mencari, AI meranking</h2>
+<div class="log" id="log"></div>
+<div id="rank" style="margin-top:12px"></div>
+<div class="row"><button class="btn hide" id="toMail">Buat draf email untuk yang dipilih</button></div>
+</section>
+
+<section id="s2" class="hide">
+<h2>3. Persetujuan panitia</h2>
+<p class="sub">AI menulis draf. Tidak ada email terkirim sebelum kamu menyetujui.</p>
+<div id="mails"></div>
+<div class="row"><button class="btn" id="approve">Setujui semua dan kirim</button></div>
+</section>
+
+<section id="s3" class="hide">
+<h2>4. Pantau dan follow-up</h2>
+<p class="sub">Simulasikan balasan perusahaan, lalu lihat keputusan agen.</p>
+<div id="track"></div>
+<h2 style="margin-top:18px">Log keputusan agen</h2>
+<div class="log" id="alog">Belum ada aktivitas.</div>
+</section>
+</div>
+
+<script>
+const COMP=[
+{n:'Perusahaan A',s:'Produk ramah lingkungan',t:['lingkungan'],x:9,src:'halaman CSR (contoh)'},
+{n:'Perusahaan B',s:'Teknologi umum',t:['teknologi','pendidikan'],x:4,src:'halaman kemitraan (contoh)'},
+{n:'Perusahaan C',s:'Minuman kemasan',t:['olahraga','musik'],x:7,src:'formulir sponsorship (contoh)'},
+{n:'Perusahaan D',s:'Penerbit dan edukasi',t:['pendidikan','musik'],x:5,src:'program CSR (contoh)'},
+{n:'Perusahaan E',s:'Layanan keuangan digital',t:['teknologi','pendidikan'],x:6,src:'kontak kemitraan (contoh)'}];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const STEPS=['1. Input','2. Analisis','3. Persetujuan','4. Pantau'];
+let reached=0,ev={},ranked=[],sel=new Set(),status={};
+function tabs(){ $('tabs').innerHTML=STEPS.map((t,i)=>`<button class="tab ${i===cur?'on':''}" ${i>reached?'disabled':''} data-i="${i}">${t}</button>`).join('');
+ document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>show(+b.dataset.i)); }
+let cur=0;
+function show(i){cur=i;reached=Math.max(reached,i);for(let k=0;k<4;k++)$('s'+k).classList.toggle('hide',k!==i);tabs();window.scrollTo(0,0);}
+function score(c){let sc=35+c.x; if(c.t[0]===ev.tema)sc+=45; else if(c.t.includes(ev.tema))sc+=28; return Math.min(98,sc);}
+function reason(c){return c.t[0]===ev.tema?`tema acara (${ev.tema}) selaras langsung dengan fokus perusahaan`:c.t.includes(ev.tema)?`ada irisan dengan tema ${ev.tema}, peluang perlu diverifikasi`:`kesesuaian tema rendah, tetapi tetap bisa menjangkau mahasiswa`;}
+function lvl(s){return s>=80?['Prioritas tinggi','']:s>=60?['Prioritas menengah','g']:['Prioritas rendah','c'];}
+$('go').onclick=()=>{
+ ev={nama:$('nama').value.trim()||'Acara Kampus',org:$('org').value.trim()||'Panitia',tema:$('tema').value,dana:$('dana').value,benefit:$('benefit').value};
+ show(1);$('rank').innerHTML='';$('toMail').classList.add('hide');
+ const L=['[RPA] Membaca proposal: '+ev.nama,'[RPA] Mencari perusahaan dan halaman CSR/kemitraan...','[RPA] 5 perusahaan dan sumber kontak publik terkumpul','[AI] Menilai kecocokan tema, audiens, dan peluang...','[AI] Menyusun peringkat prioritas'];
+ $('log').textContent='';let i=0;
+ const tick=()=>{ if(i<L.length){$('log').textContent+=L[i++]+'\n';setTimeout(tick,500);} else renderRank(); };tick();
+};
+function renderRank(){
+ ranked=COMP.map(c=>({...c,sc:score(c)})).sort((a,b)=>b.sc-a.sc);
+ sel=new Set(ranked.filter(c=>c.sc>=60).map(c=>c.n));
+ $('rank').innerHTML=ranked.map((c,i)=>{const [lb,cl]=lvl(c.sc);return `<div class="card"><div class="row" style="justify-content:space-between"><b>#${i+1} ${c.n}</b><span class="sc">${c.sc}/100</span></div><div style="color:var(--mut);font-size:14px">${c.s}</div><div class="bar"><i style="width:${c.sc}%"></i></div><span class="tag ${cl}">${lb}</span><p style="margin:8px 0 4px;font-size:14px"><b>Alasan AI:</b> ${reason(c)}.</p><p style="margin:0;font-size:12px;color:var(--mut)">Sumber untuk diverifikasi: ${c.src}</p><label style="font-weight:500"><input type="checkbox" data-n="${c.n}" ${sel.has(c.n)?'checked':''} style="width:auto;min-height:0;margin-right:6px">Hubungi perusahaan ini</label></div>`;}).join('');
+ document.querySelectorAll('#rank input').forEach(x=>x.onchange=()=>{x.checked?sel.add(x.dataset.n):sel.delete(x.dataset.n);});
+ $('toMail').classList.remove('hide');
+}
+$('toMail').onclick=()=>{
+ const list=ranked.filter(c=>sel.has(c.n));
+ if(!list.length){alert('Pilih minimal satu perusahaan.');return;}
+ $('mails').innerHTML=list.map(c=>`<div class="card"><b>Kepada: Tim CSR ${c.n}</b> <span class="tag t">Draf AI</span><pre>Subjek: Kolaborasi sponsorship ${esc(ev.nama)}
+
+Yth. Tim CSR ${c.n},
+
+Kami dari ${esc(ev.org)} akan menyelenggarakan ${esc(ev.nama)} bertema ${esc(ev.tema)}. Kami melihat ${reason(c)}. Sebagai bentuk kerja sama, kami menawarkan ${esc(ev.benefit)}, dengan target dukungan sekitar Rp${esc(ev.dana)}.
+
+Bolehkah kami menjadwalkan pertemuan singkat untuk menjelaskan lebih lanjut?
+
+Salam,
+${esc(ev.org)}</pre></div>`).join('');
+ show(2);
+};
+function alog(t){const a=$('alog');if(a.textContent==='Belum ada aktivitas.')a.textContent='';a.textContent+=t+'\n';}
+$('approve').onclick=()=>{
+ status={};ranked.filter(c=>sel.has(c.n)).forEach(c=>status[c.n]='Terkirim');
+ $('alog').textContent='Belum ada aktivitas.';alog('[Panitia] Menyetujui '+Object.keys(status).length+' email');alog('[RPA] Email dikirim sesuai jadwal (simulasi)');
+ drawTrack();show(3);
+};
+function drawTrack(){
+ $('track').innerHTML=Object.keys(status).map(n=>`<div class="card"><div class="row" style="justify-content:space-between"><b>${n}</b><span class="tag ${status[n]==='Tertarik'?'t':status[n]==='Menolak'?'c':'g'}">${status[n]}</span></div><div class="row" style="margin-top:8px"><button class="btn alt sm" data-n="${n}" data-r="tertarik">Balas: tertarik</button><button class="btn alt sm" data-n="${n}" data-r="diam">Tidak dibalas</button><button class="btn alt sm" data-n="${n}" data-r="tolak">Balas: menolak</button><button class="btn alt sm" data-n="${n}" data-r="ambigu">Balas: ambigu</button></div></div>`).join('');
+ document.querySelectorAll('#track button').forEach(b=>b.onclick=()=>sim(b.dataset.n,b.dataset.r));
+}
+function sim(n,r){
+ const M={tertarik:['Tertarik','[AI] Balasan positif dari '+n+' -> notifikasi ke panitia, siapkan jadwal negosiasi'],diam:['Follow-up dijadwalkan','[AI] '+n+' belum membalas -> draf follow-up #1 dibuat, kirim H+3 setelah disetujui aturan'],tolak:['Menolak','[AI] '+n+' menolak -> follow-up DIHENTIKAN, masuk daftar jangan hubungi'],ambigu:['Perlu tinjauan manusia','[AI] Balasan '+n+' tidak jelas -> diserahkan ke panitia, tidak diputuskan sendiri']};
+ status[n]=M[r][0];alog(M[r][1]);drawTrack();
+}
+tabs();
+</script>
+</body>
+</html>
